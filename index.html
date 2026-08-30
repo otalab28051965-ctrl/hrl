@@ -3,1538 +3,1214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hotel Revenue Lab — Fix Your OTA Listing in 48 Hours</title>
+<title>Hotel Revenue Lab — Find & Fix What's Costing You Bookings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-
-:root {
-  --black: #0a0a0a;
-  --white: #ffffff;
-  --cream: #faf8f4;
-  --ink: #1a1a1a;
-  --muted: #6b6560;
-  --rule: #e2ddd8;
-  --forest: #1c3d2e;
-  --forest-light: #2d5c45;
-  --gold: #c8960c;
-  --gold-light: #f5c842;
-  --red: #8b1a1a;
-  --red-light: #c0392b;
-  --green: #1a5c2e;
-  --green-light: #27ae60;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Inter', sans-serif;
-  background: var(--black);
-  color: var(--white);
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* ─── UTILITIES ─── */
-.mono { font-family: 'JetBrains Mono', monospace; }
-.serif { font-family: 'Playfair Display', serif; }
-.gold { color: var(--gold-light); }
-.muted { color: #999; }
-.red { color: #ff6b6b; }
-.green { color: #5cb85c; }
-
-/* ─── STICKY BAR ─── */
-.sticky-bar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  background: var(--gold);
-  color: var(--black);
-  text-align: center;
-  padding: 10px 20px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.sticky-bar strong { font-weight: 600; }
-.sticky-bar a {
-  background: var(--black);
-  color: var(--gold-light);
-  padding: 4px 14px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.7rem;
-  letter-spacing: 1px;
-  white-space: nowrap;
-}
-
-/* ─── STAGE 1: ATTENTION — HERO ─── */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 100px 24px 60px;
-  position: relative;
-  overflow: hidden;
-  background: var(--black);
-}
-
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -200px; right: -200px;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(28,61,46,0.4) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.hero-inner {
-  max-width: 760px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.eyebrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--gold-light);
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.eyebrow::before {
-  content: '';
-  display: block;
-  width: 32px;
-  height: 1px;
-  background: var(--gold);
-}
-
-.hero h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2.6rem, 7vw, 5rem);
-  font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -2px;
-  margin-bottom: 28px;
-}
-
-.hero h1 .line-accent {
-  color: var(--gold-light);
-  display: block;
-}
-
-.hero-sub {
-  font-size: 1.1rem;
-  color: #bbb;
-  max-width: 540px;
-  margin-bottom: 40px;
-  line-height: 1.7;
-}
-
-.hero-sub strong { color: var(--white); }
-
-.hero-stats {
-  display: flex;
-  gap: 40px;
-  margin-bottom: 48px;
-  flex-wrap: wrap;
-}
-
-.stat-item {
-  border-left: 2px solid var(--forest-light);
-  padding-left: 16px;
-}
-.stat-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 2rem;
-  color: var(--gold-light);
-  line-height: 1;
-}
-.stat-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: #888;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-top: 4px;
-}
-
-.cta-group {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.btn-primary {
-  background: var(--gold);
-  color: var(--black);
-  padding: 16px 32px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  text-decoration: none;
-  letter-spacing: 0.3px;
-  transition: all 0.2s;
-  border: none;
-  cursor: pointer;
-  display: inline-block;
-  white-space: nowrap;
-}
-.btn-primary:hover {
-  background: var(--gold-light);
-  transform: translateY(-1px);
-}
-
-.btn-ghost {
-  color: #aaa;
-  font-size: 0.85rem;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.2s;
-}
-.btn-ghost:hover { color: var(--white); }
-
-.scroll-hint {
-  position: absolute;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-}
-.scroll-hint span {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 2px;
-  color: #555;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 8px;
-}
-.scroll-arrow {
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(to bottom, #555, transparent);
-  margin: 0 auto;
-}
-
-/* ─── STAGE 2: INTEREST — PAIN SECTION ─── */
-.pain-section {
-  background: #0f0f0f;
-  padding: 100px 24px;
-  border-top: 1px solid #1a1a1a;
-}
-
-.pain-inner {
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.section-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--gold-light);
-  margin-bottom: 20px;
-}
-
-.pain-headline {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  line-height: 1.2;
-  margin-bottom: 48px;
-  letter-spacing: -0.5px;
-}
-
-.before-after {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  margin-bottom: 60px;
-}
-
-.before-col, .after-col {
-  padding: 32px;
-}
-
-.before-col {
-  background: #160a0a;
-  border: 1px solid #2a1010;
-}
-
-.after-col {
-  background: #0a160a;
-  border: 1px solid #102a10;
-}
-
-.col-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.before-col .col-label { color: #ff6b6b; }
-.after-col .col-label { color: #5cb85c; }
-
-.check-item {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #ccc;
-}
-
-.check-item .icon { flex-shrink: 0; margin-top: 2px; }
-
-.pain-statement {
-  background: #141414;
-  border-left: 3px solid var(--gold);
-  padding: 28px 32px;
-  margin-bottom: 0;
-}
-
-.pain-statement p {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
-  color: var(--white);
-  line-height: 1.5;
-}
-
-.pain-statement p em {
-  font-style: normal;
-  color: var(--gold-light);
-}
-
-/* ─── STAGE 3: TRUST — PROOF SECTION ─── */
-.proof-section {
-  background: var(--forest);
-  padding: 100px 24px;
-}
-
-.proof-inner {
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.case-study-block {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 48px;
-  align-items: start;
-  margin-bottom: 60px;
-}
-
-.big-number {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(5rem, 15vw, 9rem);
-  font-weight: 900;
-  line-height: 0.9;
-  color: var(--gold-light);
-  white-space: nowrap;
-}
-
-.big-number span {
-  display: block;
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  color: rgba(245,200,66,0.6);
-  letter-spacing: -1px;
-}
-
-.case-details {
-  padding-top: 8px;
-}
-
-.case-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 12px;
-}
-
-.case-details h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--white);
-}
-
-.case-details p {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.7);
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-
-.case-proof-items {
-  list-style: none;
-}
-
-.case-proof-items li {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  color: var(--gold-light);
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  display: flex;
-  gap: 8px;
-}
-
-.case-proof-items li::before { content: '→'; }
-
-.trust-divider {
-  border: none;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  margin: 60px 0;
-}
-
-.how-it-works {
-  margin-bottom: 0;
-}
-
-.how-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
-  margin-bottom: 40px;
-  letter-spacing: -0.5px;
-}
-
-.steps-grid {
-  display: grid;
-  gap: 0;
-}
-
-.step-row {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: 24px;
-  padding: 24px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  position: relative;
-}
-
-.step-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
-  color: rgba(255,255,255,0.15);
-  line-height: 1;
-  padding-top: 4px;
-}
-
-.step-content h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--white);
-}
-
-.step-content p {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
-  line-height: 1.5;
-}
-
-.step-time {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  color: var(--gold-light);
-  letter-spacing: 1px;
-  margin-top: 6px;
-}
-
-/* ─── STAGE 4: OFFER — PRICING SECTION ─── */
-.offer-section {
-  background: var(--black);
-  padding: 100px 24px;
-}
-
-.offer-inner {
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.offer-headline {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  line-height: 1.2;
-  margin-bottom: 12px;
-  letter-spacing: -0.5px;
-}
-
-.offer-sub {
-  color: #888;
-  margin-bottom: 48px;
-  font-size: 0.95rem;
-}
-
-.pricing-stack {
-  display: grid;
-  gap: 2px;
-  margin-bottom: 48px;
-}
-
-.tier-card {
-  background: #111;
-  border: 1px solid #222;
-  padding: 32px;
-  position: relative;
-  transition: border-color 0.2s;
-  cursor: pointer;
-}
-
-.tier-card:hover { border-color: #444; }
-
-.tier-card.featured {
-  background: #0f1a13;
-  border: 1px solid #2d5c45;
-}
-
-.tier-card.anchor {
-  background: #13100a;
-  border: 1px solid var(--gold);
-}
-
-.featured-badge {
-  position: absolute;
-  top: -1px; right: 24px;
-  background: var(--forest-light);
-  color: var(--white);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.58rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 4px 10px;
-}
-
-.anchor-badge {
-  position: absolute;
-  top: -1px; right: 24px;
-  background: var(--gold);
-  color: var(--black);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.58rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  font-weight: 700;
-}
-
-.tier-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.tier-name {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #888;
-  margin-bottom: 6px;
-}
-
-.tier-price {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.4rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--white);
-}
-
-.tier-card.anchor .tier-price { color: var(--gold-light); }
-
-.tier-rise {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  color: #ff6b6b;
-  margin-top: 4px;
-  letter-spacing: 0.5px;
-}
-
-.tier-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: #666;
-  text-align: right;
-  max-width: 180px;
-  line-height: 1.4;
-}
-
-.tier-divider {
-  border: none;
-  border-top: 1px solid #222;
-  margin: 20px 0;
-}
-
-.tier-card.featured .tier-divider { border-color: #2d5c45; }
-.tier-card.anchor .tier-divider { border-color: #3a2800; }
-
-.tier-includes {
-  list-style: none;
-  margin-bottom: 24px;
-}
-
-.tier-includes li {
-  font-size: 0.85rem;
-  color: #bbb;
-  padding: 7px 0;
-  border-bottom: 1px solid #1a1a1a;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.tier-card.anchor .tier-includes li { border-color: #2a1f00; }
-
-.tier-includes li .ti-icon {
-  color: var(--gold-light);
-  flex-shrink: 0;
-  margin-top: 2px;
-  font-size: 0.8rem;
-}
-
-.tier-includes li.highlight { color: var(--white); font-weight: 500; }
-
-.tier-cta {
-  display: block;
-  text-align: center;
-  padding: 14px 24px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-decoration: none;
-  letter-spacing: 0.3px;
-  transition: all 0.2s;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-.tier-cta.primary {
-  background: var(--forest-light);
-  color: var(--white);
-}
-.tier-cta.primary:hover { background: #3d7a5a; }
-
-.tier-cta.gold-cta {
-  background: var(--gold);
-  color: var(--black);
-  font-weight: 700;
-}
-.tier-cta.gold-cta:hover { background: var(--gold-light); }
-
-.tier-cta.outline {
-  border: 1px solid #333;
-  color: #aaa;
-  background: transparent;
-}
-.tier-cta.outline:hover { border-color: #666; color: var(--white); }
-
-.guarantee-block {
-  border: 1px solid var(--gold);
-  background: #0d0b00;
-  padding: 28px 32px;
-  margin-bottom: 0;
-}
-
-.guarantee-block .gtag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold-light);
-  margin-bottom: 10px;
-}
-
-.guarantee-block p {
-  font-size: 0.88rem;
-  color: #bbb;
-  line-height: 1.7;
-}
-
-.guarantee-block strong { color: var(--white); }
-
-/* ─── FASTLANE — CONVERSION ACCELERATOR ─── */
-.fastlane-section {
-  background: var(--gold);
-  padding: 80px 24px;
-}
-
-.fastlane-inner {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.fastlane-inner h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 5vw, 3rem);
-  color: var(--black);
-  margin-bottom: 12px;
-  letter-spacing: -1px;
-}
-
-.fastlane-inner p {
-  color: rgba(0,0,0,0.65);
-  margin-bottom: 32px;
-  font-size: 0.95rem;
-}
-
-.yes-block {
-  background: var(--black);
-  color: var(--gold-light);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.2rem;
-  padding: 20px 40px;
-  display: inline-block;
-  margin-bottom: 16px;
-  letter-spacing: 2px;
-}
-
-.fastlane-sub {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.68rem;
-  color: rgba(0,0,0,0.5);
-  letter-spacing: 0.5px;
-}
-
-/* ─── OBJECTION HANDLING ─── */
-.objections-section {
-  background: #0a0a0a;
-  padding: 100px 24px;
-}
-
-.objections-inner {
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.objections-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  margin-bottom: 48px;
-  letter-spacing: -0.5px;
-}
-
-.faq-list {
-  display: grid;
-  gap: 2px;
-}
-
-.faq-item {
-  background: #111;
-  border: 1px solid #1e1e1e;
-  overflow: hidden;
-}
-
-.faq-q {
-  padding: 22px 28px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  user-select: none;
-  transition: background 0.15s;
-}
-
-.faq-q:hover { background: #161616; }
-
-.faq-q .faq-icon {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.2rem;
-  color: var(--gold-light);
-  flex-shrink: 0;
-  transition: transform 0.2s;
-  line-height: 1;
-}
-
-.faq-item.open .faq-icon { transform: rotate(45deg); }
-
-.faq-a {
-  display: none;
-  padding: 0 28px 24px;
-  font-size: 0.9rem;
-  color: #aaa;
-  line-height: 1.7;
-  border-top: 1px solid #1e1e1e;
-}
-
-.faq-a strong { color: var(--white); }
-.faq-item.open .faq-a { display: block; }
-
-/* ─── FINAL CTA ─── */
-.final-cta {
-  background: var(--forest);
-  padding: 100px 24px;
-  text-align: center;
-}
-
-.final-inner {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.final-inner h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  margin-bottom: 16px;
-  letter-spacing: -1px;
-}
-
-.final-inner p {
-  color: rgba(255,255,255,0.65);
-  margin-bottom: 40px;
-  font-size: 0.95rem;
-  line-height: 1.7;
-}
-
-.final-cta-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 32px;
-}
-
-.deadline-flag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--gold-light);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  background: rgba(200,150,12,0.1);
-  border: 1px solid rgba(200,150,12,0.3);
-  padding: 8px 20px;
-  display: inline-block;
-}
-
-/* ─── FOLLOW-UP SECTION (email sequence reference) ─── */
-.followup-section {
-  background: #050505;
-  padding: 80px 24px;
-  border-top: 1px solid #1a1a1a;
-}
-
-.followup-inner {
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.followup-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.6rem;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
-}
-
-.followup-sub {
-  color: #666;
-  font-size: 0.85rem;
-  margin-bottom: 40px;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.email-sequence {
-  display: grid;
-  gap: 2px;
-}
-
-.email-item {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: 0;
-  background: #0d0d0d;
-  border: 1px solid #1a1a1a;
-  overflow: hidden;
-}
-
-.email-day {
-  background: #111;
-  padding: 24px 16px;
-  text-align: center;
-  border-right: 1px solid #1a1a1a;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.email-day .day-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
-  color: var(--gold-light);
-  line-height: 1;
-}
-
-.email-day .day-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.55rem;
-  color: #555;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-top: 4px;
-}
-
-.email-body {
-  padding: 24px;
-}
-
-.email-subject {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.68rem;
-  color: var(--gold-light);
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-
-.email-body h4 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--white);
-}
-
-.email-body p {
-  font-size: 0.82rem;
-  color: #888;
-  line-height: 1.5;
-}
-
-.email-body .email-cta {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--gold-light);
-  margin-top: 10px;
-  display: block;
-  border: 1px solid rgba(200,150,12,0.3);
-  padding: 6px 12px;
-  width: fit-content;
-}
-
-/* ─── FOOTER ─── */
-footer {
-  background: var(--black);
-  border-top: 1px solid #1a1a1a;
-  padding: 32px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-footer .brand {
-  font-family: 'Playfair Display', serif;
-  font-size: 1rem;
-  color: #666;
-}
-
-footer .links {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-footer a {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: #444;
-  text-decoration: none;
-  letter-spacing: 0.5px;
-  transition: color 0.2s;
-}
-footer a:hover { color: #888; }
-
-/* ─── MOBILE ─── */
-@media (max-width: 640px) {
-  .before-after { grid-template-columns: 1fr; }
-  .case-study-block { grid-template-columns: 1fr; gap: 24px; }
-  .big-number { font-size: 5rem; }
-  .tier-header { flex-direction: column; }
-  .email-item { grid-template-columns: 60px 1fr; }
-  .hero-stats { gap: 24px; }
-  .cta-group { flex-direction: column; align-items: flex-start; }
-  .sticky-bar { font-size: 0.62rem; }
-}
+  /* ─── TOKENS ─────────────────────────────────────────── */
+  :root {
+    --navy:    #0A0F1E;
+    --navy-2:  #111827;
+    --navy-3:  #1E2A3A;
+    --amber:   #F59E0B;
+    --amber-d: #D97706;
+    --amber-l: #FEF3C7;
+    --slate:   #94A3B8;
+    --slate-2: #64748B;
+    --off:     #F8F7F4;
+    --white:   #FFFFFF;
+    --red:     #EF4444;
+    --green:   #10B981;
+    --border:  rgba(255,255,255,0.08);
+    --r:       10px;
+    --r-lg:    16px;
+  }
+
+  /* ─── RESET ──────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { text-decoration: none; color: inherit; }
+
+  /* ─── TYPOGRAPHY ─────────────────────────────────────── */
+  .display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  .display-xl  { font-size: clamp(2.4rem, 5vw, 4rem); }
+  .display-lg  { font-size: clamp(1.8rem, 3.5vw, 2.8rem); }
+  .display-md  { font-size: clamp(1.4rem, 2.5vw, 2rem); }
+  .label       { font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  /* ─── LAYOUT ─────────────────────────────────────────── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .section-pad { padding: 96px 0; }
+  .section-pad-sm { padding: 64px 0; }
+
+  /* ─── NAV ────────────────────────────────────────────── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,15,30,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 1rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--amber); flex-shrink: 0;
+    box-shadow: 0 0 10px var(--amber);
+  }
+  .nav-cta {
+    background: var(--amber);
+    color: var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 0.85rem;
+    padding: 10px 20px; border-radius: 6px;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--amber-d); }
+
+  /* ─── URGENCY BAR ────────────────────────────────────── */
+  .urgency-bar {
+    background: var(--amber);
+    color: var(--navy);
+    text-align: center;
+    padding: 10px 24px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 0.85rem;
+  }
+  .urgency-bar span { opacity: 0.7; margin: 0 8px; }
+
+  /* ─── HERO ───────────────────────────────────────────── */
+  .hero {
+    background: var(--navy);
+    padding: 80px 0 60px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; right: -100px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 100px;
+    padding: 6px 14px; margin-bottom: 24px;
+    color: var(--amber);
+  }
+  .hero h1 { color: var(--white); margin-bottom: 20px; }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--amber);
+  }
+  .hero-sub {
+    color: var(--slate);
+    font-size: 1.1rem;
+    max-width: 480px;
+    margin-bottom: 36px;
+    line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--amber);
+    color: var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 1rem;
+    padding: 16px 28px; border-radius: var(--r);
+    transition: all 0.2s;
+    border: none; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--amber-d); transform: translateY(-1px); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent;
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 0.95rem;
+    padding: 16px 24px; border-radius: var(--r);
+    border: 1px solid var(--border);
+    transition: all 0.2s; cursor: pointer;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.3); }
+  .hero-note { color: var(--slate); font-size: 0.8rem; margin-top: 12px; }
+
+  /* ─── LEAK SCORE WIDGET (SIGNATURE) ──────────────────── */
+  .leak-widget {
+    background: var(--navy-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    position: relative;
+  }
+  .leak-widget-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .leak-widget-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.85rem; color: var(--slate); }
+  .leak-badge {
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: var(--red);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em;
+    padding: 4px 10px; border-radius: 100px;
+    text-transform: uppercase;
+  }
+  .score-display {
+    display: flex; align-items: baseline; gap: 6px;
+    margin-bottom: 6px;
+  }
+  .score-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 3.5rem;
+    color: var(--red); line-height: 1;
+  }
+  .score-denom {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 1.2rem;
+    color: var(--slate);
+  }
+  .score-label { color: var(--slate); font-size: 0.8rem; margin-bottom: 20px; }
+  .dimension-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .dim-name { font-size: 0.78rem; color: var(--slate); min-width: 120px; }
+  .dim-bar-bg {
+    flex: 1; height: 6px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden;
+  }
+  .dim-bar {
+    height: 100%; border-radius: 3px;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .dim-bar.red    { background: var(--red); }
+  .dim-bar.amber  { background: var(--amber); }
+  .dim-bar.green  { background: var(--green); }
+  .dim-score { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.78rem; min-width: 30px; text-align: right; }
+  .widget-footer {
+    margin-top: 18px; padding-top: 18px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .widget-footer-text { font-size: 0.78rem; color: var(--slate); }
+  .widget-prop-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; font-weight: 600; color: var(--white); }
+
+  /* ─── PROOF BAND ─────────────────────────────────────── */
+  .proof-band {
+    background: var(--off);
+    padding: 40px 0;
+    border-top: 1px solid #E5E3DE;
+    border-bottom: 1px solid #E5E3DE;
+  }
+  .proof-band .label { color: var(--slate-2); margin-bottom: 28px; text-align: center; }
+  .proof-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 32px; text-align: center;
+  }
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 2.2rem;
+    color: var(--navy); line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-num em { color: var(--amber-d); font-style: normal; }
+  .stat-label { font-size: 0.82rem; color: var(--slate-2); line-height: 1.4; }
+
+  /* ─── TESTIMONIAL ────────────────────────────────────── */
+  .testimonial-block {
+    margin-top: 36px;
+    background: var(--white);
+    border: 1px solid #E5E3DE;
+    border-radius: var(--r-lg);
+    padding: 28px 32px;
+    max-width: 720px; margin-left: auto; margin-right: auto;
+    margin-top: 36px;
+  }
+  .testimonial-quote {
+    font-size: 1.05rem; color: var(--navy);
+    line-height: 1.7; margin-bottom: 16px;
+    font-style: italic;
+  }
+  .testimonial-quote::before { content: '"'; }
+  .testimonial-quote::after  { content: '"'; }
+  .testimonial-attr {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .testimonial-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--navy-3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 0.9rem; color: var(--amber); flex-shrink: 0;
+  }
+  .testimonial-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.88rem; color: var(--navy); }
+  .testimonial-role { font-size: 0.78rem; color: var(--slate-2); }
+  .stars { color: var(--amber-d); font-size: 0.9rem; margin-bottom: 3px; }
+
+  /* ─── PROBLEM ────────────────────────────────────────── */
+  .section-light { background: var(--off); color: var(--navy); }
+  .section-dark  { background: var(--navy); color: var(--white); }
+  .section-mid   { background: var(--navy-2); color: var(--white); }
+  .section-eyebrow {
+    display: inline-block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 0.72rem; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 16px;
+    padding: 5px 12px; border-radius: 100px;
+  }
+  .eyebrow-dark { background: rgba(245,158,11,0.12); color: var(--amber); }
+  .eyebrow-light { background: rgba(10,15,30,0.08); color: var(--navy-3); }
+
+  .section-h { margin-bottom: 16px; }
+  .section-sub { font-size: 1.05rem; line-height: 1.7; max-width: 560px; }
+  .section-sub.light { color: var(--slate); }
+  .section-sub.dark  { color: var(--slate-2); }
+
+  .problem-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 40px; align-items: start; margin-top: 56px;
+  }
+  .problem-pains { display: flex; flex-direction: column; gap: 16px; }
+  .pain-item {
+    display: flex; gap: 14px;
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.15);
+    border-radius: var(--r);
+    padding: 16px 18px;
+  }
+  .pain-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(239,68,68,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .pain-text { font-size: 0.9rem; color: var(--navy-3); line-height: 1.5; }
+  .pain-text strong { display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 600; margin-bottom: 3px; }
+  .problem-visual {
+    background: var(--navy);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    color: var(--white);
+  }
+  .problem-visual-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 0.82rem; color: var(--slate);
+    margin-bottom: 20px;
+  }
+  .booking-sim { display: flex; flex-direction: column; gap: 10px; }
+  .booking-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--navy-2);
+    border-radius: 8px; padding: 12px 14px;
+    border: 1px solid var(--border);
+  }
+  .booking-rank {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 0.82rem;
+    color: var(--slate); min-width: 20px;
+  }
+  .booking-bar {
+    flex: 1; height: 8px; background: rgba(255,255,255,0.06);
+    border-radius: 4px; overflow: hidden;
+  }
+  .booking-fill { height: 100%; border-radius: 4px; }
+  .booking-label { font-size: 0.75rem; color: var(--slate); min-width: 70px; text-align: right; }
+  .booking-row.yours { border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05); }
+  .booking-row.yours .booking-rank { color: var(--red); }
+  .booking-note {
+    margin-top: 14px; padding: 10px 14px;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 8px;
+    font-size: 0.8rem; color: var(--red); line-height: 1.5;
+  }
+
+  /* ─── SOLUTION ───────────────────────────────────────── */
+  .solution-intro {
+    text-align: center; max-width: 680px; margin: 0 auto 60px;
+  }
+  .solution-intro .section-sub { margin: 0 auto; }
+  .tiers {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px; margin-top: 48px;
+  }
+  .tier {
+    background: var(--navy-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 28px 24px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .tier:hover { border-color: rgba(245,158,11,0.3); }
+  .tier.featured {
+    border-color: var(--amber);
+    background: linear-gradient(135deg, rgba(245,158,11,0.06) 0%, var(--navy-2) 100%);
+  }
+  .tier-badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--amber); color: var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 0.65rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 4px 12px; border-radius: 100px;
+    white-space: nowrap;
+  }
+  .tier-icon { font-size: 1.8rem; margin-bottom: 14px; }
+  .tier-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 1rem; margin-bottom: 6px;
+  }
+  .tier-tagline { font-size: 0.82rem; color: var(--slate); margin-bottom: 20px; line-height: 1.4; }
+  .tier-price {
+    display: flex; align-items: baseline; gap: 4px;
+    margin-bottom: 6px;
+  }
+  .price-amt {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 2rem; color: var(--white);
+  }
+  .price-note { font-size: 0.78rem; color: var(--slate); }
+  .price-window {
+    font-size: 0.72rem; color: var(--amber);
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .tier-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  .tier-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .tier-features li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.85rem; color: var(--slate); line-height: 1.4;
+  }
+  .tier-features li::before {
+    content: '✓';
+    color: var(--green); font-weight: 700;
+    flex-shrink: 0; margin-top: 0;
+  }
+  .tier-cta {
+    display: block; width: 100%; text-align: center;
+    margin-top: 24px; padding: 13px;
+    border-radius: var(--r); font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 0.9rem;
+    transition: all 0.2s; cursor: pointer; border: none;
+  }
+  .tier-cta-primary { background: var(--amber); color: var(--navy); }
+  .tier-cta-primary:hover { background: var(--amber-d); }
+  .tier-cta-outline { background: transparent; color: var(--white); border: 1px solid var(--border); }
+  .tier-cta-outline:hover { border-color: rgba(255,255,255,0.3); }
+  .tier-note { font-size: 0.72rem; color: var(--slate); text-align: center; margin-top: 8px; }
+
+  /* Group tier */
+  .group-tier {
+    margin-top: 20px;
+    background: var(--navy-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 24px 28px;
+    display: flex; align-items: center; gap: 32px;
+    flex-wrap: wrap;
+  }
+  .group-tier-left { flex: 1; min-width: 200px; }
+  .group-tier-right { flex-shrink: 0; }
+  .group-tag {
+    display: inline-block;
+    background: rgba(16,185,129,0.12);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: var(--green);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 0.7rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 100px;
+    margin-bottom: 10px;
+  }
+  .group-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 6px; }
+  .group-desc { font-size: 0.85rem; color: var(--slate); }
+
+  /* ─── FEATURES ───────────────────────────────────────── */
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 56px;
+  }
+  .feature-card {
+    background: var(--navy-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 28px 24px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .feature-card:hover { border-color: rgba(245,158,11,0.2); transform: translateY(-2px); }
+  .feature-icon-wrap {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 18px;
+  }
+  .feature-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 1rem; margin-bottom: 8px;
+  }
+  .feature-benefit { font-size: 0.88rem; color: var(--slate); line-height: 1.6; margin-bottom: 14px; }
+  .feature-metric {
+    display: inline-block;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    color: var(--green);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 0.75rem;
+    padding: 3px 10px; border-radius: 100px;
+  }
+
+  /* ─── HOW IT WORKS ───────────────────────────────────── */
+  .steps {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0; margin-top: 56px; position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 28px; left: calc(12.5% + 16px); right: calc(12.5% + 16px);
+    height: 2px;
+    background: linear-gradient(90deg, var(--amber), rgba(245,158,11,0.2));
+    z-index: 0;
+  }
+  .step { text-align: center; padding: 0 16px; position: relative; z-index: 1; }
+  .step-num {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--amber); color: var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; flex-shrink: 0;
+    position: relative; z-index: 2;
+  }
+  .step-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; margin-bottom: 8px; font-size: 0.95rem;
+  }
+  .step-desc { font-size: 0.82rem; color: var(--slate); line-height: 1.5; }
+  .step-time {
+    display: inline-block; margin-top: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 0.7rem;
+    color: var(--amber);
+    background: rgba(245,158,11,0.1);
+    padding: 2px 8px; border-radius: 100px;
+  }
+
+  /* ─── FREE ADD-ONS ───────────────────────────────────── */
+  .addons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+  .addon-card {
+    background: var(--navy-2); border: 1px solid var(--border);
+    border-radius: var(--r-lg); padding: 24px;
+  }
+  .addon-free {
+    display: inline-block;
+    background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25);
+    color: var(--green);
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 100px; margin-bottom: 12px;
+  }
+  .addon-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; margin-bottom: 8px; }
+  .addon-desc { font-size: 0.85rem; color: var(--slate); line-height: 1.5; margin-bottom: 12px; }
+  .addon-after { font-size: 0.75rem; color: var(--slate-2); }
+  .addon-after strong { color: var(--amber); }
+
+  /* ─── FAQ ────────────────────────────────────────────── */
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+  .faq-item {
+    background: var(--navy-2); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 22px 24px;
+  }
+  .faq-q {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 0.95rem;
+    margin-bottom: 10px; color: var(--white);
+  }
+  .faq-a { font-size: 0.88rem; color: var(--slate); line-height: 1.6; }
+
+  /* ─── FINAL CTA ──────────────────────────────────────── */
+  .final-cta {
+    background: linear-gradient(135deg, var(--navy-3) 0%, var(--navy) 100%);
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 96px 0;
+    position: relative; overflow: hidden;
+  }
+  .final-cta::before {
+    content: '';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse, rgba(245,158,11,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .final-cta-inner { position: relative; z-index: 1; }
+  .final-cta h2 { margin-bottom: 16px; }
+  .final-cta h2 em { color: var(--amber); font-style: normal; }
+  .final-cta-sub {
+    font-size: 1.05rem; color: var(--slate);
+    max-width: 520px; margin: 0 auto 40px; line-height: 1.7;
+  }
+  .final-cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary-lg {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--amber); color: var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 1.05rem;
+    padding: 18px 36px; border-radius: var(--r);
+    transition: all 0.2s;
+  }
+  .btn-primary-lg:hover { background: var(--amber-d); transform: translateY(-2px); }
+  .cta-guarantee {
+    margin-top: 20px; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    font-size: 0.82rem; color: var(--slate);
+  }
+  .cta-guarantee::before { content: '🔒'; font-size: 0.9rem; }
+
+  /* ─── FOOTER ─────────────────────────────────────────── */
+  footer {
+    background: var(--navy);
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer-note { font-size: 0.78rem; color: var(--slate-2); }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { font-size: 0.78rem; color: var(--slate-2); transition: color 0.2s; }
+  .footer-links a:hover { color: var(--amber); }
+
+  /* ─── ANIMATIONS ─────────────────────────────────────── */
+  @keyframes barFill {
+    from { width: 0; }
+    to   { width: var(--w); }
+  }
+  .animate-bar { animation: barFill 1.5s cubic-bezier(0.4,0,0.2,1) forwards; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.6s ease forwards; }
+
+  /* ─── RESPONSIVE ─────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .hero-grid    { grid-template-columns: 1fr; gap: 40px; }
+    .proof-stats  { grid-template-columns: repeat(2, 1fr); }
+    .tiers        { grid-template-columns: 1fr; }
+    .features-grid{ grid-template-columns: 1fr 1fr; }
+    .steps        { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .steps::before{ display: none; }
+    .faq-grid     { grid-template-columns: 1fr; }
+    .addons-grid  { grid-template-columns: 1fr; }
+    .problem-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .features-grid{ grid-template-columns: 1fr; }
+    .steps        { grid-template-columns: 1fr; }
+    .proof-stats  { grid-template-columns: 1fr 1fr; }
+    .footer-inner { flex-direction: column; text-align: center; }
+    .hero-actions { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+  }
 </style>
 </head>
 <body>
 
-<!-- STICKY URGENCY BAR -->
-<div class="sticky-bar">
-  <strong>⚑ August pricing closes Sept 1 —</strong>
-  Partner rises $1,599 → $1,999 &nbsp;|&nbsp; Bundle rises $899 → $1,099
-  <a href="https://cal.com/ota-lab-lz6m5m/partnerplan">Book Now →</a>
+<!-- ── URGENCY BAR ──────────────────────────────────────── -->
+<div class="urgency-bar">
+  Peak Season Rescue Window <span>·</span> Closes September 5 <span>·</span> Prices step up permanently after that
 </div>
 
+<!-- ── NAV ─────────────────────────────────────────────── -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <div class="logo">
+        <div class="logo-dot"></div>
+        Hotel Revenue Lab
+      </div>
+      <a href="https://cal.com/ota-lab-lz6m5m/revenue-leak-audit" class="nav-cta">
+        Get Your Leak Audit — $299
+      </a>
+    </div>
+  </div>
+</nav>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- STAGE 1: ATTENTION                                     -->
-<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ── HERO ─────────────────────────────────────────────── -->
 <section class="hero">
-  <div class="hero-inner">
+  <div class="container">
+    <div class="hero-grid">
 
-    <div class="eyebrow">OTA Revenue Rescue · Independent Hotels · 48 Hours</div>
-
-    <h1>
-      Your hotel is full
-      <span class="line-accent">on weekends.</span>
-      So why is Tuesday empty?
-    </h1>
-
-    <p class="hero-sub">
-      Your listing was built once and never touched again.
-      <strong>Every day it sits unchanged, a competitor ranks above you</strong>
-      — and books the guests who should have been yours.
-    </p>
-
-    <div class="hero-stats">
-      <div class="stat-item">
-        <div class="stat-num">+23%</div>
-        <div class="stat-label">RevPAR · 60 days</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">48hr</div>
-        <div class="stat-label">Delivery from payment</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">$499</div>
-        <div class="stat-label">Entry this month</div>
-      </div>
-    </div>
-
-    <div class="cta-group">
-      <a href="https://cal.com/ota-lab-lz6m5m/partnerplan" class="btn-primary">Fix My Listing — Book a Slot →</a>
-      <a href="#offer" class="btn-ghost">↓ See pricing</a>
-    </div>
-
-  </div>
-
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <div class="scroll-arrow"></div>
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- STAGE 2: INTEREST — THE PAIN                          -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<section class="pain-section">
-  <div class="pain-inner">
-
-    <div class="section-tag">// The problem</div>
-
-    <h2 class="pain-headline">
-      You didn't build this hotel<br>
-      to donate 20% of every booking<br>
-      to an OTA that doesn't care.
-    </h2>
-
-    <div class="before-after">
-
-      <div class="before-col">
-        <div class="col-label">✗ &nbsp;Right now</div>
-        <div class="check-item"><span class="icon">✗</span><span>Same rate Monday through Sunday — algorithm penalises this</span></div>
-        <div class="check-item"><span class="icon">✗</span><span>5 photos when competitors have 15+</span></div>
-        <div class="check-item"><span class="icon">✗</span><span>40-word description that could be any hotel in any city</span></div>
-        <div class="check-item"><span class="icon">✗</span><span>4 unanswered bad reviews killing conversions silently</span></div>
-        <div class="check-item"><span class="icon">✗</span><span>Booking.com ranking dropping weekly — you don't know why</span></div>
-        <div class="check-item"><span class="icon">✗</span><span>One OTA, one algorithm, zero backup if it changes</span></div>
-      </div>
-
-      <div class="after-col">
-        <div class="col-label">✓ &nbsp;After 48 hours</div>
-        <div class="check-item"><span class="icon">✓</span><span>Dynamic pricing calendar — peak nights earn more, slow nights fill faster</span></div>
-        <div class="check-item"><span class="icon">✓</span><span>Photo sequence that makes guests click, not scroll past</span></div>
-        <div class="check-item"><span class="icon">✓</span><span>180-word listing that sells the experience, not just the room</span></div>
-        <div class="check-item"><span class="icon">✓</span><span>Every bad review answered — skeptics become bookings</span></div>
-        <div class="check-item"><span class="icon">✓</span><span>Competitor rate map — you always know where you stand</span></div>
-        <div class="check-item"><span class="icon">✓</span><span>Second OTA live — occupancy from two directions</span></div>
-      </div>
-
-    </div>
-
-    <div class="pain-statement">
-      <p>
-        The hotel down the street has <em>worse reviews than you.</em>
-        But they show up first. They fill midweek. You don't.
-        That's not luck. That's a listing built to convert
-        versus one that isn't.
-      </p>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- STAGE 3: TRUST — PROOF + PROCESS                      -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<section class="proof-section">
-  <div class="proof-inner">
-
-    <div class="section-tag">// Proof it works</div>
-
-    <div class="case-study-block">
+      <!-- Left: Copy -->
       <div>
-        <div class="big-number">
-          +23%
-          <span>RevPAR</span>
+        <div class="hero-eyebrow">
+          <div class="logo-dot" style="width:6px;height:6px;"></div>
+          <span class="label" style="font-size:0.68rem;">For independent boutique hotels · 10–30 rooms</span>
         </div>
-      </div>
-      <div class="case-details">
-        <div class="case-tag">Case Study · 14-Room Boutique Hotel</div>
-        <h3>Independent property. Listing untouched for 11 months.</h3>
-        <p>
-          Static pricing, wrong hero photo, 42-word description,
-          5 unanswered reviews. Standard rescue delivered in 47 hours.
-          RevPAR measured Week 1 vs Week 8 via OTA dashboard screenshots.
+
+        <h1 class="display display-xl section-h">
+          Your listing is<br>losing bookings.<br>
+          <em>We show you where.</em>
+        </h1>
+
+        <p class="hero-sub">
+          We score your Booking.com listing across 6 revenue dimensions, audit your Google Business Profile, and map your competitors' pricing — in 24 hours. Then fix all of it in 48.
         </p>
-        <ul class="case-proof-items">
-          <li>Zero ad spend</li>
-          <li>No OTA upgrades purchased</li>
-          <li>No rate cuts — ADR actually increased</li>
-          <li>60-day measurement window</li>
-          <li>Owner implemented recommendations within 9 days</li>
-        </ul>
+
+        <div class="hero-actions">
+          <a href="https://cal.com/ota-lab-lz6m5m/revenue-leak-audit" class="btn-primary">
+            Get Your Revenue Leak Audit — $299
+            <span>→</span>
+          </a>
+          <a href="https://cal.com/ota-lab-lz6m5m/rescue-only-hotel-revenue-lab" class="btn-secondary">
+            Skip to full rescue
+          </a>
+        </div>
+        <p class="hero-note">24-hour delivery · No calls · 100% async · $200 comes off your rescue if you upgrade</p>
+      </div>
+
+      <!-- Right: Leak Score Widget -->
+      <div>
+        <div class="leak-widget">
+          <div class="leak-widget-header">
+            <div>
+              <div class="leak-widget-title">REVENUE LEAK REPORT · SAMPLE</div>
+              <div class="widget-prop-name">Independent Boutique Hotel · Southeast Asia</div>
+            </div>
+            <div class="leak-badge">Critical Leaks</div>
+          </div>
+
+          <div class="score-display">
+            <div class="score-num">31</div>
+            <div class="score-denom">/60</div>
+          </div>
+          <div class="score-label">Listing health score · 29 points of revenue being lost</div>
+
+          <div class="dimension-row">
+            <div class="dim-name">Photo sequence</div>
+            <div class="dim-bar-bg"><div class="dim-bar red animate-bar" style="--w:30%;width:30%"></div></div>
+            <div class="dim-score" style="color:var(--red)">3/10</div>
+          </div>
+          <div class="dimension-row">
+            <div class="dim-name">Description</div>
+            <div class="dim-bar-bg"><div class="dim-bar red animate-bar" style="--w:20%;width:20%"></div></div>
+            <div class="dim-score" style="color:var(--red)">2/10</div>
+          </div>
+          <div class="dimension-row">
+            <div class="dim-name">Pricing</div>
+            <div class="dim-bar-bg"><div class="dim-bar red animate-bar" style="--w:10%;width:10%"></div></div>
+            <div class="dim-score" style="color:var(--red)">1/10</div>
+          </div>
+          <div class="dimension-row">
+            <div class="dim-name">Review responses</div>
+            <div class="dim-bar-bg"><div class="dim-bar amber animate-bar" style="--w:50%;width:50%"></div></div>
+            <div class="dim-score" style="color:var(--amber)">5/10</div>
+          </div>
+          <div class="dimension-row">
+            <div class="dim-name">OTA visibility</div>
+            <div class="dim-bar-bg"><div class="dim-bar amber animate-bar" style="--w:60%;width:60%"></div></div>
+            <div class="dim-score" style="color:var(--amber)">6/10</div>
+          </div>
+          <div class="dimension-row">
+            <div class="dim-name">GMB alignment</div>
+            <div class="dim-bar-bg"><div class="dim-bar green animate-bar" style="--w:80%;width:80%"></div></div>
+            <div class="dim-score" style="color:var(--green)">8/10</div>
+          </div>
+
+          <div class="widget-footer">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+            <div class="widget-footer-text">Photo sequence &amp; static pricing are your biggest revenue leaks right now</div>
+          </div>
+        </div>
       </div>
     </div>
-
-    <hr class="trust-divider">
-
-    <div class="how-it-works">
-      <h3 class="how-title">How it works. Every time.</h3>
-
-      <div class="steps-grid">
-        <div class="step-row">
-          <div class="step-num">1</div>
-          <div class="step-content">
-            <h4>Book & Pay</h4>
-            <p>Choose your tier. 100% upfront via PayPal. No calls, no intake forms, no questionnaires.</p>
-            <div class="step-time">⏱ 5 minutes</div>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-num">2</div>
-          <div class="step-content">
-            <h4>48-Hour Clock Starts</h4>
-            <p>From the moment PayPal confirms. Not from booking. Not from a discovery call. From payment.</p>
-            <div class="step-time">⏱ Clock starts immediately</div>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-num">3</div>
-          <div class="step-content">
-            <h4>Full Package Delivered to Your Inbox</h4>
-            <p>Google Drive folder: rewritten listing, photo sequence, 14-day pricing calendar, competitor map, review templates, GBP audit.</p>
-            <div class="step-time">⏱ Within 48 hours</div>
-          </div>
-        </div>
-        <div class="step-row">
-          <div class="step-num">4</div>
-          <div class="step-content">
-            <h4>You Implement. Results Follow.</h4>
-            <p>Update your OTA listing using the deliverables. Most hotels see meaningful improvement in 2–4 weeks.</p>
-            <div class="step-time">⏱ 14-day implementation recommended</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </section>
 
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- STAGE 4: OFFER — PRICING                              -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<section class="offer-section" id="offer">
-  <div class="offer-inner">
-
-    <div class="section-tag">// The offer</div>
-    <h2 class="offer-headline">Three ways to work together.<br>One deadline.</h2>
-    <p class="offer-sub">August pricing closes September 1. All tiers rise that day. No exceptions.</p>
-
-    <div class="pricing-stack">
-
-      <!-- ANCHOR TIER — Lead with this -->
-      <div class="tier-card anchor">
-        <div class="anchor-badge">Lead with this</div>
-        <div class="tier-header">
-          <div>
-            <div class="tier-name">Revenue Partner</div>
-            <div class="tier-price">$1,599</div>
-            <div class="tier-rise">→ $1,999 on Sept 1</div>
-          </div>
-          <div class="tier-tag">Rescue + September<br>rate management +<br>revenue guarantee</div>
-        </div>
-        <hr class="tier-divider">
-        <ul class="tier-includes">
-          <li class="highlight"><span class="ti-icon">★</span>Revenue guarantee: +10% RevPAR in 60 days or October management is free</li>
-          <li><span class="ti-icon">→</span>Complete listing rewrite (150+ words, SEO-optimised)</li>
-          <li><span class="ti-icon">→</span>Photo sequence recommendation</li>
-          <li><span class="ti-icon">→</span>14-day dynamic pricing calendar</li>
-          <li><span class="ti-icon">→</span>Competitor rate map (3 comparable properties)</li>
-          <li><span class="ti-icon">→</span>Review response templates (last 5 negative reviews)</li>
-          <li><span class="ti-icon">→</span>Free Google Business Profile audit</li>
-          <li class="highlight"><span class="ti-icon">★</span>Weekly rate management through September</li>
-        </ul>
-        <a href="https://cal.com/ota-lab-lz6m5m/partnerplan" class="tier-cta gold-cta">Book Revenue Partner — $1,599 →</a>
+<!-- ── SOCIAL PROOF ──────────────────────────────────────── -->
+<section class="proof-band">
+  <div class="container">
+    <div class="label eyebrow-light" style="display:block;text-align:center;margin-bottom:28px;">Verified results from independent boutique hotels</div>
+    <div class="proof-stats">
+      <div>
+        <div class="stat-num"><em>+23%</em></div>
+        <div class="stat-label">RevPAR improvement within 60 days — 14-room independent boutique hotel</div>
       </div>
-
-      <!-- FEATURED TIER -->
-      <div class="tier-card featured">
-        <div class="featured-badge">Most Popular</div>
-        <div class="tier-header">
-          <div>
-            <div class="tier-name">Revenue Bundle</div>
-            <div class="tier-price">$899</div>
-            <div class="tier-rise">→ $1,099 on Sept 1</div>
-          </div>
-          <div class="tier-tag">Rescue + secondary<br>channel + GBP<br>audit + priority</div>
-        </div>
-        <hr class="tier-divider">
-        <ul class="tier-includes">
-          <li><span class="ti-icon">→</span>Everything in Rescue</li>
-          <li class="highlight"><span class="ti-icon">★</span>Secondary OTA channel setup (Agoda or Expedia)</li>
-          <li class="highlight"><span class="ti-icon">★</span>Priority support — replies within 4 hours</li>
-          <li><span class="ti-icon">→</span>Extended Google Business Profile audit</li>
-        </ul>
-        <a href="https://cal.com/ota-lab-lz6m5m/revenue-bundle-hotel-revenue-lab" class="tier-cta primary">Book Revenue Bundle — $899 →</a>
+      <div>
+        <div class="stat-num">48<em>hr</em></div>
+        <div class="stat-label">From payment to full rescue delivery — listing rewrite, pricing, reviews</div>
       </div>
-
-      <!-- ENTRY TIER -->
-      <div class="tier-card">
-        <div class="tier-header">
-          <div>
-            <div class="tier-name">Rescue Only</div>
-            <div class="tier-price">$499</div>
-            <div class="tier-rise">→ $799 on Sept 1</div>
-          </div>
-          <div class="tier-tag">48-hour listing<br>overhaul. Entry<br>point.</div>
-        </div>
-        <hr class="tier-divider">
-        <ul class="tier-includes">
-          <li><span class="ti-icon">→</span>Listing rewrite (150+ words)</li>
-          <li><span class="ti-icon">→</span>Photo sequence recommendation</li>
-          <li><span class="ti-icon">→</span>14-day pricing calendar</li>
-          <li><span class="ti-icon">→</span>Competitor rate map</li>
-          <li><span class="ti-icon">→</span>Review response templates</li>
-          <li><span class="ti-icon">→</span>Google Business Profile audit (bonus)</li>
-        </ul>
-        <a href="https://cal.com/ota-lab-lz6m5m/rescue-only-hotel-revenue-lab" class="tier-cta outline">Book Rescue Only — $499 →</a>
+      <div>
+        <div class="stat-num">6</div>
+        <div class="stat-label">Revenue dimensions audited — photos, description, pricing, reviews, OTA visibility, GMB</div>
       </div>
-
-      <!-- GROUP -->
-      <div class="tier-card">
-        <div class="tier-header">
-          <div>
-            <div class="tier-name">Group Rescue</div>
-            <div class="tier-price">$1,349</div>
-            <div class="tier-rise">→ $1,699 on Sept 1 · Up to 3 properties</div>
-          </div>
-          <div class="tier-tag">One owner,<br>multiple properties.<br>72hr delivery.</div>
-        </div>
-        <hr class="tier-divider">
-        <ul class="tier-includes">
-          <li><span class="ti-icon">→</span>Full rescue for up to 3 properties</li>
-          <li><span class="ti-icon">→</span>One owner, one engagement slot</li>
-          <li><span class="ti-icon">→</span>72-hour delivery</li>
-        </ul>
-        <a href="https://cal.com/ota-lab-lz6m5m/group-rescue-hotel-revenue-lab" class="tier-cta outline">Book Group Rescue — $1,349 →</a>
+      <div>
+        <div class="stat-num"><em>$0</em></div>
+        <div class="stat-label">Risk on Partner tier — if RevPAR doesn't improve 10%+ in 60 days, next month is free</div>
       </div>
-
     </div>
 
-    <!-- GUARANTEE -->
-    <div class="guarantee-block">
-      <div class="gtag">// Revenue Guarantee · Partner Tier Only</div>
-      <p>
-        If RevPAR does not improve <strong>10%+ within 60 days</strong> of rescue delivery,
-        October management is free. Conditions: <strong>(a)</strong> all rescue recommendations
-        implemented within 14 days, <strong>(b)</strong> weekly rate adjustments applied within
-        48 hours of receipt, <strong>(c)</strong> measured via OTA dashboard screenshots
-        comparing Week 1 vs Week 8 average.
+    <div class="testimonial-block">
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-quote">
+        The audit showed us we were charging the same rate on a Friday night as a Tuesday. That one change alone recovered more than the cost of the rescue in the first week.
+      </div>
+      <div class="testimonial-attr">
+        <div class="testimonial-avatar">R</div>
+        <div>
+          <div class="testimonial-name">Rigo · Bolivia</div>
+          <div class="testimonial-role">Owner, 4-property boutique cabin group</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROBLEM ───────────────────────────────────────────── -->
+<section class="section-light section-pad">
+  <div class="container">
+    <div class="section-eyebrow eyebrow-light">The Problem</div>
+    <h2 class="display display-lg section-h" style="color:var(--navy);">
+      The hotel down the road has<br>worse reviews and ranks above you.
+    </h2>
+    <p class="section-sub dark" style="color:var(--slate-2);">
+      That's not luck. That's a listing built to convert — and yours isn't. September bookings are being made right now. Every day your listing runs with these problems, a booking goes elsewhere permanently.
+    </p>
+
+    <div class="problem-grid">
+      <div class="problem-pains">
+        <div class="pain-item">
+          <div class="pain-icon">📸</div>
+          <div class="pain-text">
+            <strong>Room interior as your lead photo</strong>
+            Guests decide to click or scroll in under one second. A room photo loses that decision to a competitor's pool shot 30–40% of the time.
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">💰</div>
+          <div class="pain-text">
+            <strong>Same rate every night of the week</strong>
+            Static pricing means you charge a Tuesday the same as a Saturday. You're donating your weekend premium to guests who would have happily paid more.
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">⭐</div>
+          <div class="pain-text">
+            <strong>Unanswered negative reviews</strong>
+            Booking.com's algorithm penalises unresponded reviews. Guests read responses before booking. One unanswered complaint in 90 days costs you ranking and trust.
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">📝</div>
+          <div class="pain-text">
+            <strong>60-word description written in 2022</strong>
+            The platform's search algorithm changed. Descriptions under 150 words with outdated keyword patterns rank below properties that updated theirs. Your listing is invisible to search.
+          </div>
+        </div>
+      </div>
+
+      <div class="problem-visual">
+        <div class="problem-visual-title">BOOKING.COM SEARCH RESULTS — UBUD, BALI · TONIGHT</div>
+        <div class="booking-sim">
+          <div class="booking-row">
+            <div class="booking-rank">#1</div>
+            <div class="booking-bar"><div class="booking-fill" style="width:92%;background:var(--green);height:100%;border-radius:4px;"></div></div>
+            <div class="booking-label" style="color:var(--green);">Score 91/100</div>
+          </div>
+          <div class="booking-row">
+            <div class="booking-rank">#2</div>
+            <div class="booking-bar"><div class="booking-fill" style="width:78%;background:var(--green);height:100%;border-radius:4px;"></div></div>
+            <div class="booking-label" style="color:var(--green);">Score 78/100</div>
+          </div>
+          <div class="booking-row">
+            <div class="booking-rank">#3</div>
+            <div class="booking-bar"><div class="booking-fill" style="width:71%;background:var(--amber);height:100%;border-radius:4px;"></div></div>
+            <div class="booking-label" style="color:var(--amber);">Score 71/100</div>
+          </div>
+          <div class="booking-row yours">
+            <div class="booking-rank">#9</div>
+            <div class="booking-bar"><div class="booking-fill" style="width:39%;background:var(--red);height:100%;border-radius:4px;"></div></div>
+            <div class="booking-label" style="color:var(--red);">Your property</div>
+          </div>
+        </div>
+        <div class="booking-note">
+          Properties ranked #1–3 capture ~70% of all clicks on this page. You are receiving ~4%. The gap is not your rooms — it's your listing.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOLUTION ──────────────────────────────────────────── -->
+<section class="section-dark section-pad">
+  <div class="container">
+    <div class="solution-intro">
+      <div class="section-eyebrow eyebrow-dark">The Solution</div>
+      <h2 class="display display-lg section-h">
+        Start with the audit.<br>
+        <em style="color:var(--amber)">Then fix everything.</em>
+      </h2>
+      <p class="section-sub light">
+        The $299 Revenue Leak Audit shows you exactly where you're losing bookings and why. If you want it fixed, $200 comes off the rescue price. No obligation.
       </p>
     </div>
 
-  </div>
-</section>
+    <div class="tiers">
 
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- STAGE 5: CONVERSION — FASTLANE                        -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<section class="fastlane-section">
-  <div class="fastlane-inner">
-    <h2>Skip the form.<br>Just reply YES.</h2>
-    <p>No calls. No intake. No questionnaires. Reply to any email from Sandy with one word and get your invoice in 30 minutes.</p>
-    <div class="yes-block">Reply "YES" → Invoice in 30 min</div>
-    <div class="fastlane-sub">or book directly via the links above · PayPal: paypal.me/csv380</div>
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- OBJECTION HANDLING                                     -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<section class="objections-section">
-  <div class="objections-inner">
-
-    <div class="section-tag">// Common questions</div>
-    <h2 class="objections-title">Everything you're wondering.</h2>
-
-    <div class="faq-list">
-
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggle(this)">
-          "I've tried updating my listing myself. Nothing changed."
-          <span class="faq-icon">+</span>
+      <!-- Audit -->
+      <div class="tier">
+        <div class="tier-icon">🔍</div>
+        <div class="tier-name">Revenue Leak Audit</div>
+        <div class="tier-tagline">Know exactly what's broken before you fix anything</div>
+        <div class="tier-price">
+          <div class="price-amt">$299</div>
         </div>
-        <div class="faq-a">
-          There's a difference between updating a listing and optimising one. Most self-edits fix typos or add a photo. A rescue restructures the description for OTA keyword ranking, resequences photos for click-through, builds a pricing calendar the algorithm rewards, and handles reviews in a way that converts skeptics. It's a different kind of work — which is why the outcome is different.
-        </div>
+        <div class="price-window">Sep 1–5 only · Gone after September 5</div>
+        <hr class="tier-divider">
+        <ul class="tier-features">
+          <li>Listing Leak Report — scored across 6 dimensions (out of 60)</li>
+          <li>GMB Leak Report — 8-checkpoint Google Business Profile audit</li>
+          <li>3-Competitor Pricing Snapshot — weeknight vs weekend rates</li>
+          <li>Delivered in 24 hours via Google Drive</li>
+          <li>$200 comes off rescue if you upgrade within 5 days</li>
+        </ul>
+        <a href="https://cal.com/ota-lab-lz6m5m/revenue-leak-audit" class="tier-cta tier-cta-outline">
+          Start with the Audit
+        </a>
+        <div class="tier-note">Best first step for every new property</div>
       </div>
 
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggle(this)">
-          "How do I know it'll work for my property?"
-          <span class="faq-icon">+</span>
+      <!-- Rescue (featured) -->
+      <div class="tier featured">
+        <div class="tier-badge">Most Popular</div>
+        <div class="tier-icon">⚡</div>
+        <div class="tier-name">Rescue Only</div>
+        <div class="tier-tagline">48-hour full listing overhaul — fixed, not just reported</div>
+        <div class="tier-price">
+          <div class="price-amt">$499</div>
+          <div class="price-note">/ Sep 1–5</div>
         </div>
-        <div class="faq-a">
-          The Revenue Partner tier includes a <strong>revenue guarantee</strong>: if RevPAR doesn't improve 10%+ in 60 days, October management is free. The conditions are clear and fair — you implement within 14 days, apply weekly adjustments within 48 hours. If you do your part and it doesn't work, we cover October. That's the only guarantee in this industry that's tied to a measurable outcome.
-        </div>
+        <div class="price-window">Moves to $599 on Sep 6</div>
+        <hr class="tier-divider">
+        <ul class="tier-features">
+          <li>Full listing rewrite (150+ words, OTA keyword-optimised)</li>
+          <li>Photo sequence recommendation with rationale</li>
+          <li>14-day dynamic pricing calendar (weekday/weekend split)</li>
+          <li>Competitor rate map — 3 direct properties</li>
+          <li>Review response templates — last 5 negatives addressed</li>
+          <li>Done-for-you GMB Update Pack</li>
+          <li>Full Listing Leak Report included</li>
+        </ul>
+        <a href="https://cal.com/ota-lab-lz6m5m/rescue-only-hotel-revenue-lab" class="tier-cta tier-cta-primary">
+          Book Rescue — $499
+        </a>
+        <div class="tier-note">$299 audit credit applied automatically if upgrading</div>
       </div>
 
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggle(this)">
-          "$1,599 is expensive. I'm not sure about the ROI."
-          <span class="faq-icon">+</span>
+      <!-- Partner -->
+      <div class="tier">
+        <div class="tier-icon">🎯</div>
+        <div class="tier-name">Revenue Partner</div>
+        <div class="tier-tagline">Fix it, then manage it — with a guarantee</div>
+        <div class="tier-price">
+          <div class="price-amt">$1,599</div>
+          <div class="price-note">/ Sep 1–5</div>
         </div>
-        <div class="faq-a">
-          For a 14-room hotel averaging $80/night at 60% occupancy, a 10% RevPAR improvement is roughly <strong>$4,000+ in additional annual revenue</strong>. The Partner fee pays for itself within 3 weeks of the first improvement. If the math doesn't work at your rate and occupancy — the Rescue at $499 is the right entry point. Two extra bookings and it's paid for itself.
-        </div>
+        <div class="price-window">Moves to $1,799 on Sep 6</div>
+        <hr class="tier-divider">
+        <ul class="tier-features">
+          <li>Everything in Rescue</li>
+          <li>2nd OTA channel setup (Agoda or Expedia)</li>
+          <li>Weekly rate management through September</li>
+          <li>Revenue guarantee — +10% RevPAR in 60 days or October free</li>
+          <li>All 3 free add-ons monthly for 60 days</li>
+          <li>Priority 12-hour support</li>
+        </ul>
+        <a href="https://cal.com/ota-lab-lz6m5m/partnerplan" class="tier-cta tier-cta-outline">
+          Become a Partner
+        </a>
+        <div class="tier-note">Includes revenue guarantee — details in FAQ</div>
       </div>
+    </div>
 
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggle(this)">
-          "Who is Sandy? I can't find you online."
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          Hotel Revenue Lab is a faceless specialist practice — no LinkedIn, no personal profile, no video calls. This isn't a gap; it's the business model. By not having an office, a sales team, or a personal brand to maintain, the overhead stays low and the pricing stays between Fiverr commodity work and agency retainers. You're paying for the deliverables and the result, not for my headshot.
-        </div>
+    <!-- Group Tier -->
+    <div class="group-tier">
+      <div class="group-tier-left">
+        <div class="group-tag">Multi-Property</div>
+        <div class="group-name display">Group Rescue — up to 3 properties</div>
+        <div class="group-desc">One owner, multiple properties. All three rescued in 72 hours for one flat fee. Counts as one delivery slot — not three. Rescue-level deliverables per property.</div>
       </div>
-
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggle(this)">
-          "Do I need to give you access to my OTA account?"
-          <span class="faq-icon">+</span>
+      <div>
+        <div style="text-align:right;margin-bottom:6px;">
+          <div class="price-amt" style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:700;">$1,349</div>
+          <div style="font-size:0.75rem;color:var(--slate);">Sep 1–5 · moves to $1,549 on Sep 6</div>
         </div>
-        <div class="faq-a">
-          No. Everything is delivered as a Google Drive package — documents, spreadsheets, templates. You implement in your own account. You never share credentials, login details, or access. The deliverables are complete and self-explanatory.
-        </div>
+        <a href="https://cal.com/ota-lab-lz6m5m/group-rescue-hotel-revenue-lab" class="tier-cta tier-cta-outline" style="padding:12px 28px;display:inline-block;width:auto;">
+          Book Group Rescue
+        </a>
       </div>
-
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggle(this)">
-          "What if I'm not happy with the delivery?"
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          One round of revisions is included in all tiers. If a specific deliverable misses the brief, flag it and it gets fixed. What isn't offered: refunds on delivered work. The Terms of Service are linked in the footer and cover this clearly. The work is done-for-you and delivered in full — revisions are the recourse, not refunds.
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggle(this)">
-          "Why does the price go up September 1?"
-          <span class="faq-icon">+</span>
-        </div>
-        <div class="faq-a">
-          August is the sprint window. The capacity constraint is real — 2 concurrent delivery slots maximum. After August 31, September delivery slots open at the standard rate. The urgency isn't manufactured: there's a hard limit on how many rescues can be delivered at 48-hour speed, and August pricing reflects that sprint window specifically.
-        </div>
-      </div>
-
     </div>
 
   </div>
 </section>
 
+<!-- ── FEATURES ───────────────────────────────────────────── -->
+<section class="section-mid section-pad">
+  <div class="container">
+    <div class="section-eyebrow eyebrow-dark">What You Get</div>
+    <h2 class="display display-lg section-h">Every deliverable has<br>one job: more bookings.</h2>
+    <p class="section-sub light">Not a report you'll file. Not a PDF you'll read once. Documents built to be implemented within 48 hours of receiving them.</p>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- FOLLOW-UP SEQUENCE — shown as social proof            -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<section class="followup-section">
-  <div class="followup-inner">
-
-    <div class="section-tag">// What happens after you book</div>
-    <h2 class="followup-title">The follow-through sequence.</h2>
-    <p class="followup-sub mono">Every client gets this. No exceptions.</p>
-
-    <div class="email-sequence">
-
-      <div class="email-item">
-        <div class="email-day">
-          <div class="day-num">0</div>
-          <div class="day-label">Day</div>
-        </div>
-        <div class="email-body">
-          <div class="email-subject">// On payment confirmation</div>
-          <h4>Clock starts. Confirmation sent.</h4>
-          <p>"Payment received. Your 48-hour clock starts now. Delivery to this email by [time + 48hr]. You'll receive a Drive link with all deliverables in one folder."</p>
-        </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-wrap">📸</div>
+        <div class="feature-name">Photo Sequence Overhaul</div>
+        <div class="feature-benefit">We reorder your photos to put your strongest impression first. Exterior, pool, and atmosphere shots as the lead image increase click-through rates by 30–40% on Booking.com.</div>
+        <div class="feature-metric">+30–40% CTR</div>
       </div>
-
-      <div class="email-item">
-        <div class="email-day">
-          <div class="day-num">2</div>
-          <div class="day-label">Day</div>
-        </div>
-        <div class="email-body">
-          <div class="email-subject">// Delivery</div>
-          <h4>Full package in your inbox.</h4>
-          <p>Drive link with: listing rewrite, photo sequence, pricing calendar, competitor map, review templates, GBP audit, September roadmap (upsell doc for Partner conversion).</p>
-          <span class="email-cta">→ Reply with questions anytime</span>
-        </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">✍️</div>
+        <div class="feature-name">Listing Rewrite</div>
+        <div class="feature-benefit">150+ words, written to Booking.com's current algorithm. Includes the keyword patterns the platform favours for your property category. Copy-paste ready — change takes 5 minutes.</div>
+        <div class="feature-metric">Improves search rank</div>
       </div>
-
-      <div class="email-item">
-        <div class="email-day">
-          <div class="day-num">3</div>
-          <div class="day-label">Day</div>
-        </div>
-        <div class="email-body">
-          <div class="email-subject">// Check-in</div>
-          <h4>"Did the photo sequence make sense?"</h4>
-          <p>Implementation check. Answer questions. For non-Partner clients: soft push to lock September Partner rate before Aug 31.</p>
-        </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">📅</div>
+        <div class="feature-name">14-Day Pricing Calendar</div>
+        <div class="feature-benefit">Dynamic pricing built for your property — weekday base, weekend premium (typically 15–25% higher), local events flagged. Every night priced differently because demand is different every night.</div>
+        <div class="feature-metric">+15–25% RevPAR</div>
       </div>
-
-      <div class="email-item">
-        <div class="email-day">
-          <div class="day-num">7</div>
-          <div class="day-label">Day</div>
-        </div>
-        <div class="email-body">
-          <div class="email-subject">// Partner upsell / last call</div>
-          <h4>"Last call on August Partner rate."</h4>
-          <p>September rate goes to $1,999. Final push for Rescue/Bundle clients to upgrade before deadline.</p>
-          <span class="email-cta">→ cal.com/ota-lab-lz6m5m/partnerplan</span>
-        </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">🗺️</div>
+        <div class="feature-name">Competitor Rate Map</div>
+        <div class="feature-benefit">Your 3–5 closest competitors, their current weeknight and weekend rates, their OTA positioning. You'll know exactly where you're underpriced (leaving money on the table) and where you're overpriced (losing the click).</div>
+        <div class="feature-metric">Full market context</div>
       </div>
-
+      <div class="feature-card">
+        <div class="feature-icon-wrap">💬</div>
+        <div class="feature-name">Review Response Templates</div>
+        <div class="feature-benefit">Your last 5 negative reviews, each with a written professional response. Booking.com's algorithm factors owner responsiveness into your ranking score. Responding to every review also converts undecided guests.</div>
+        <div class="feature-metric">Ranking + trust signal</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">📍</div>
+        <div class="feature-name">Done-For-You GMB Update</div>
+        <div class="feature-benefit">Your Google Business Profile description rewritten, category corrected, photo sequence recommended, recent review responses drafted. You paste — we write. Takes 10 minutes to implement.</div>
+        <div class="feature-metric">Google search presence</div>
+      </div>
     </div>
-
   </div>
 </section>
 
+<!-- ── FREE ADD-ONS ──────────────────────────────────────── -->
+<section class="section-dark section-pad-sm">
+  <div class="container">
+    <div class="section-eyebrow eyebrow-dark">Included Free With Every Tier</div>
+    <h2 class="display display-md section-h">Intelligence that chain hotels<br>pay $500+/month for.</h2>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- FINAL CTA                                             -->
-<!-- ═══════════════════════════════════════════════════════ -->
+    <div class="addons-grid">
+      <div class="addon-card">
+        <div class="addon-free">Free · Included</div>
+        <div class="addon-name">Listing Leak Report</div>
+        <div class="addon-desc">Scored audit across 6 dimensions — photos, description, pricing, reviews, OTA visibility, GMB alignment. Each scored out of 10. Total out of 60. Shows you the priority order for fixes.</div>
+        <div class="addon-after">After free period: <strong>$49/month</strong></div>
+      </div>
+      <div class="addon-card">
+        <div class="addon-free">Free · Included</div>
+        <div class="addon-name">GMB Update Pack</div>
+        <div class="addon-desc">Description rewritten, category corrected, review responses drafted, photo sequence recommended — all copy-paste ready. You implement in 10 minutes. We do the writing.</div>
+        <div class="addon-after">After free period: <strong>$49/month</strong></div>
+      </div>
+      <div class="addon-card">
+        <div class="addon-free">Free · Delivered Sep 10+</div>
+        <div class="addon-name">5-Competitor Pricing Report</div>
+        <div class="addon-desc">Your 5 closest competitors, priced across 6 scenarios: weeknight, weekend, 7-day advance, 30-day advance, same-day, peak date. Written interpretation of where you're under or overpriced.</div>
+        <div class="addon-after">After free period: <strong>$99/month</strong> · All three bundled: <strong>$149/month</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ──────────────────────────────────────── -->
+<section class="section-light section-pad">
+  <div class="container">
+    <div class="section-eyebrow eyebrow-light">How It Works</div>
+    <h2 class="display display-lg section-h" style="color:var(--navy);">From payment to better listing<br>in under 48 hours.</h2>
+    <p class="section-sub dark">No calls. No kickoff meetings. No onboarding forms. You pay, you send us the Booking.com link, we deliver.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Book & Pay</div>
+        <div class="step-desc">Choose your tier. Pay via PayPal. 100% upfront, no splits. The 48-hour clock starts the moment payment is confirmed — not when you book.</div>
+        <div class="step-time">5 minutes</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Send Your Listing</div>
+        <div class="step-desc">Reply to our confirmation email with your Booking.com URL, room count, average nightly rate, and your 2–3 biggest concerns. That's all we need to start.</div>
+        <div class="step-time">2 minutes</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">We Build</div>
+        <div class="step-desc">We audit, rewrite, score, and build every deliverable. All research, writing, and analysis happens on our end. You don't touch anything yet.</div>
+        <div class="step-time">24–48 hours</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">You Implement</div>
+        <div class="step-desc">You receive a Google Drive folder with everything. Copy-paste the listing rewrite into Booking.com. Follow the photo sequence. Apply the pricing calendar. Done.</div>
+        <div class="step-time">30 minutes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────────────────── -->
+<section class="section-dark section-pad">
+  <div class="container">
+    <div class="section-eyebrow eyebrow-dark">Questions</div>
+    <h2 class="display display-lg section-h">Everything you're wondering.</h2>
+
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q">Do I have to take a call or do an onboarding?</div>
+        <div class="faq-a">No. Everything is async. You pay, send your Booking.com link, and receive your deliverables via Google Drive. We answer questions by email within 12 hours. No calls, ever.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Who is this for?</div>
+        <div class="faq-a">Independent boutique hotels with 10–30 rooms, listed on Booking.com or Agoda, with a rating between 3.2 and 4.4. If you're a chain property or have fewer than 5 photos uploaded, message us first.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What exactly is the revenue guarantee?</div>
+        <div class="faq-a">Partner tier only. If your RevPAR doesn't improve 10%+ within 60 days, October rate management is free. Conditions: implement all recommendations within 14 days, apply weekly rate adjustments within 48 hours of receipt. Measured via OTA dashboard screenshots Week 1 vs Week 8.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How is the $200 audit credit applied?</div>
+        <div class="faq-a">If you book the $299 Revenue Leak Audit and decide to upgrade to any rescue package within 5 days of receiving the report, $200 is deducted from your rescue invoice automatically. You effectively paid $99 for the audit.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Why do prices step up after September 5?</div>
+        <div class="faq-a">The Peak Season Rescue Window closes September 5. We're offering this pricing to properties that want to fix their listings before the high-season window closes. After September 5, we return to standard pricing as demand stabilises.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What is the 5-Competitor Pricing Report?</div>
+        <div class="faq-a">Delivered after September 10, this shows how your 5 closest competitors price by room type, day of week, and booking window (7-day advance, 30-day advance, same-day). Revenue managers at chain hotels pay $500–$2,000/month for equivalent data. It's included free with every tier.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What if I only have one property in my group?</div>
+        <div class="faq-a">Choose Rescue Only ($499) or Revenue Bundle ($899). The Group Rescue is for up to 3 properties under the same ownership where you want all three covered under one flat fee.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do you work with all property types?</div>
+        <div class="faq-a">We focus exclusively on independent boutique hotels with 10–30 rooms. Chain properties, branded hotels, and large resorts are not our focus — the problems we solve are specific to independently-operated properties that manage their own OTA listings.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FINAL CTA ──────────────────────────────────────────── -->
 <section class="final-cta">
-  <div class="final-inner">
-
-    <div class="section-tag" style="justify-content:center; display:flex; margin-bottom:20px;">// Make the call</div>
-
-    <h2>Your listing is losing money<br>every day it sits unchanged.</h2>
-
-    <p>
-      This is the simplest decision: spend $499–$1,599 now,
-      get a 48-hour fix, and measure the difference in 60 days.
-      Or keep watching the competitor down the road
-      fill their rooms while yours sit empty on Tuesdays.
-    </p>
-
-    <div class="final-cta-stack">
-      <div class="deadline-flag">⚑ August pricing closes September 1, 2026</div>
-      <a href="https://cal.com/ota-lab-lz6m5m/partnerplan" class="btn-primary" style="font-size:1rem; padding:18px 40px;">
-        Book Revenue Partner — $1,599 →
-      </a>
-      <a href="https://cal.com/ota-lab-lz6m5m/revenue-bundle-hotel-revenue-lab" class="btn-ghost" style="color:#aaa;">
-        Or start with Bundle ($899) →
-      </a>
-      <a href="https://cal.com/ota-lab-lz6m5m/rescue-only-hotel-revenue-lab" class="btn-ghost" style="color:#666; font-size:0.8rem;">
-        Entry: Rescue Only ($499) →
-      </a>
+  <div class="container">
+    <div class="final-cta-inner">
+      <div class="section-eyebrow eyebrow-dark" style="display:inline-block;margin-bottom:20px;">Peak Season Rescue Window · Closes September 5</div>
+      <h2 class="display display-xl final-cta" style="background:none;padding:0;border:none;">
+        September bookings are being<br>made <em>right now.</em>
+      </h2>
+      <p class="final-cta-sub">
+        Every day your listing runs with the wrong lead photo, static pricing, and unanswered reviews — a booking goes to the hotel that fixed theirs. Start with the $299 audit. See the score. Then decide.
+      </p>
+      <div class="final-cta-actions">
+        <a href="https://cal.com/ota-lab-lz6m5m/revenue-leak-audit" class="btn-primary-lg">
+          Get Revenue Leak Audit — $299
+          <span>→</span>
+        </a>
+        <a href="https://cal.com/ota-lab-lz6m5m/rescue-only-hotel-revenue-lab" class="btn-secondary" style="border-color:rgba(255,255,255,0.2);">
+          Skip to Rescue — $499
+        </a>
+      </div>
+      <div class="cta-guarantee">
+        100% upfront · No calls · 24-hour audit delivery · $200 audit credit toward rescue
+      </div>
     </div>
-
-    <p style="color:#666; font-size:0.8rem; font-family:'JetBrains Mono',monospace; margin-top:8px;">
-      Ready now? Skip the form — reply YES to any email from Sandy.<br>
-      Invoice in 30 minutes. PayPal: paypal.me/csv380
-    </p>
-
   </div>
 </section>
 
-
-<!-- FOOTER -->
+<!-- ── FOOTER ────────────────────────────────────────────── -->
 <footer>
-  <div class="brand">Hotel Revenue Lab · Sandy</div>
-  <div class="links">
-    <a href="https://docs.google.com/document/d/11SeRsX5QODDrdIQ6wMWL4f-2rYr0dm5kDgkN_1EtH6g/edit?tab=t.0" target="_blank">Terms of Service</a>
-    <a href="https://cal.com/ota-lab-lz6m5m/partnerplan">Book a Slot</a>
-    <a href="https://paypal.me/csv380">PayPal</a>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="logo" style="margin-bottom:6px;">
+          <div class="logo-dot"></div>
+          Hotel Revenue Lab
+        </div>
+        <div class="footer-note">Operated by Sandy · Independent revenue practice · Async-only delivery · Worldwide</div>
+      </div>
+      <div class="footer-links">
+        <a href="https://docs.google.com/document/d/11SeRsX5QODDrdIQ6wMWL4f-2rYr0dm5kDgkN_1EtH6g" target="_blank">Terms of Service</a>
+        <a href="https://cal.com/ota-lab-lz6m5m/revenue-leak-audit">Book Audit</a>
+        <a href="mailto:sandy@hotelrevenuelab.co">Contact</a>
+      </div>
+    </div>
   </div>
 </footer>
 
 <script>
-// FAQ toggle
-function toggle(el) {
-  const item = el.parentElement;
-  const wasOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
-  if (!wasOpen) item.classList.add('open');
-}
-
-// Sticky bar hide on scroll past hero
-window.addEventListener('scroll', () => {
-  const bar = document.querySelector('.sticky-bar');
-  if (window.scrollY > 80) {
-    bar.style.transform = 'translateY(-100%)';
-    bar.style.transition = 'transform 0.3s';
-  } else {
-    bar.style.transform = 'translateY(0)';
-  }
-});
-
-// Smooth highlight on tier hover
-document.querySelectorAll('.tier-card').forEach(card => {
-  card.addEventListener('click', () => {
-    const cta = card.querySelector('.tier-cta');
-    if (cta) window.location.href = cta.href;
+  // Animate bars on scroll into view
+  const bars = document.querySelectorAll('.animate-bar');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animationPlayState = 'running';
+      }
+    });
+  }, { threshold: 0.2 });
+  bars.forEach(bar => {
+    bar.style.animationPlayState = 'paused';
+    observer.observe(bar);
   });
-});
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
 </script>
 
 </body>
